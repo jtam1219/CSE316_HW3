@@ -154,7 +154,38 @@ export const useGlobalStore = () => {
         }
         asyncCreateList();
     }
-    
+
+    store.deleteMarkedList = function () {
+        
+    }
+
+    store.deleteList = function (id){
+        async function asyncDeleteList(id){
+            let response = await api.deleteTop5ListById(id);
+            if(response.data.success){
+                storeReducer({
+                    type: GlobalStoreActionType.CLOSE_CURRENT_LIST,
+                    payload: {}
+                });
+            }
+        }
+        asyncDeleteList(id);
+    }
+    //idNamePair has not been identified!
+    store.markListForDeletion = function (idNamePair) {
+
+    }
+
+    store.showDeleteListModal = function () {
+        let modal = document.getElementById("delete-modal");
+        modal.classList.add("is-visible");
+    }
+
+    store.hideDeleteListModal = function () {
+        let modal = document.getElementById("delete-modal");
+        modal.classList.remove("is-visible");
+    }
+
     // THIS FUNCTION PROCESSES CHANGING A LIST NAME
     store.changeListName = function (id, newName) {
         // GET THE LIST
