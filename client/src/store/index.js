@@ -44,7 +44,7 @@ export const useGlobalStore = () => {
         switch (type) {
             case GlobalStoreActionType.CREATE_LIST: {
                 return setStore({
-                    idNamePairs: store.idNamePairs,
+                    idNamePairs: payload.idNamePairs,
                     currentList: payload.top5List,
                     newListCounter: payload.newListCounter,
                     isListNameEditActive: false,
@@ -122,16 +122,23 @@ export const useGlobalStore = () => {
             const response = await api.createTop5List(newList);
             if (response.data.success) {
                 let top5List=response.data.top5List;
-                storeReducer({
-                    type: GlobalStoreActionType.CREATE_LIST,
-                    payload: {
-                        top5List: top5List,
-                        newListCounter: store.newListCounter++                        
-                    } 
-                });
+                    async function getListPairs() {
+                        response = await api.getTop5ListPairs();
+                        if (response.data.success) {
+                            let pairsArray = response.data.idNamePairs;
+                            storeReducer({
+                                type: GlobalStoreActionType.CREATE_LIST,
+                                payload: {
+                                    idNamePairs: pairsArray,
+                                    top5List: top5List,
+                                    newListCounter: store.newListCounter++   
+                                }
+                            });
+                        }
+                    }
+                getListPairs();
             }
         }
-
         asyncCreateList();
     }
     
@@ -216,6 +223,33 @@ export const useGlobalStore = () => {
         }
         asyncSetCurrentList(id);
     }
+    store.addMoveItemTransaction = function (start, end) {
+        let transaction = new MoveItem_Transaction(store, start, end);
+        tps.addTransaction(transaction);
+    }
+    store.moveItem = function (start, end) {
+        start -= 1;
+        end -= 1;
+        if (start < end) {
+            let temp = store.currentList.items[start];
+            for (let i = start; i < end; i++) {
+                store.currentList.items[i] = store.currentList.items[i + 1];
+            }
+            store.currentList.items[end] = temp;
+        }
+        else if (start > end) {
+            let temp = store.currentList.items[start];
+            for (let i = start; i > end; i--) {
+                store.currentList.items[i] = store.currentList.items[i - 1];
+            }
+            store.currentList.items[end] = temp;
+        }
+
+        // NOW MAKE IT OFFICIAL
+        store.updateCurrentList();
+    }
+
+    //THIS IS FOR CHANGEITEM TRANSCATION JUST CHANGE UP SOME OF THE STUFF
     store.addMoveItemTransaction = function (start, end) {
         let transaction = new MoveItem_Transaction(store, start, end);
         tps.addTransaction(transaction);
