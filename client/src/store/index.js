@@ -13,6 +13,7 @@ export const GlobalStoreContext = createContext({});
 // THESE ARE ALL THE TYPES OF UPDATES TO OUR GLOBAL
 // DATA STORE STATE THAT CAN BE PROCESSED
 export const GlobalStoreActionType = {
+    //CREATE_LIST: "CREATE_LIST"
     CHANGE_LIST_NAME: "CHANGE_LIST_NAME",
     CLOSE_CURRENT_LIST: "CLOSE_CURRENT_LIST",
     LOAD_ID_NAME_PAIRS: "LOAD_ID_NAME_PAIRS",
@@ -41,6 +42,17 @@ export const useGlobalStore = () => {
     const storeReducer = (action) => {
         const { type, payload } = action;
         switch (type) {
+            case GlobalStoreActionType.CREATE_LIST: {
+                return setStore({
+                    idNamePairs: store.idNamePairs,
+                    currentList: payload.top5List,
+                    newListCounter: payload.newListCounter,
+                    isListNameEditActive: false,
+                    isItemEditActive: false,
+                    listMarkedForDeletion: null
+                })
+            }
+            
             // LIST UPDATE OF ITS NAME
             case GlobalStoreActionType.CHANGE_LIST_NAME: {
                 return setStore({
@@ -103,7 +115,26 @@ export const useGlobalStore = () => {
     // THESE ARE THE FUNCTIONS THAT WILL UPDATE OUR STORE AND
     // DRIVE THE STATE OF THE APPLICATION. WE'LL CALL THESE IN 
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
+    
+    
+    store.createList = function(newList){
+        async function asyncCreateList() {
+            const response = await api.createTop5List(newList);
+            if (response.data.success) {
+                let top5List=response.data.top5List;
+                storeReducer({
+                    type: GlobalStoreActionType.CREATE_LIST,
+                    payload: {
+                        top5List: top5List,
+                        newListCounter: store.newListCounter++                        
+                    } 
+                });
+            }
+        }
 
+        asyncCreateList();
+    }
+    
     // THIS FUNCTION PROCESSES CHANGING A LIST NAME
     store.changeListName = function (id, newName) {
         // GET THE LIST

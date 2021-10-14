@@ -25,7 +25,16 @@ const ListSelector = () => {
                 selected={false}
             />
         ))
-    }
+    }  
+
+    function handleClick(){
+        let newList={
+            name: "Untitled",
+            items: ["?","?","?","?","?"]
+        }
+        store.createList(newList)
+    }  
+    
     return (
         <div id="top5-list-selector">
             <div id="list-selector-heading">
@@ -33,7 +42,8 @@ const ListSelector = () => {
                     type="button"
                     id="add-list-button"
                     className="top5-button"
-                    value="+" />
+                    value="+" 
+                    onClick={handleClick}/>
                 Your Lists
             </div>
             <div id="list-selector-list">
