@@ -283,7 +283,7 @@ export const useGlobalStore = () => {
                             payload: {
                                 idNamePairs: pairsArray,
                                 top5List: top5List
-                            }
+                            } 
                         });
                     }
                 }
