@@ -73,7 +73,7 @@ function ListCard(props) {
             </span>
             <input
                 disabled={cardStatus}
-                type="button"
+                type="button" 
                 id={"delete-list-" + idNamePair._id}
                 className="list-card-button"
                 value={"\u2715"}
