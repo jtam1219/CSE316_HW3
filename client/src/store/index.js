@@ -15,6 +15,7 @@ export const GlobalStoreContext = createContext({});
 // DATA STORE STATE THAT CAN BE PROCESSED
 export const GlobalStoreActionType = {
     CREATE_LIST: "CREATE_LIST",
+    DELETE_LIST: "DELETE_LIST",
     CHANGE_LIST_NAME: "CHANGE_LIST_NAME",
     CLOSE_CURRENT_LIST: "CLOSE_CURRENT_LIST",
     LOAD_ID_NAME_PAIRS: "LOAD_ID_NAME_PAIRS",
@@ -46,12 +47,23 @@ export const useGlobalStore = () => {
         switch (type) {
             case GlobalStoreActionType.CREATE_LIST: {
                 return setStore({
-                    idNamePairs: payload.idNamePairs,
+                    idNamePairs: store.idNamePairs,
                     currentList: payload.top5List,
                     newListCounter: payload.newListCounter,
                     isListNameEditActive: false,
                     isItemEditActive: false,
                     listMarkedForDeletion: null
+                })
+            }
+
+            case GlobalStoreActionType.DELETE_LIST: {
+                return setStore({
+                    idNamePairs: store.idNamePairs,
+                    currentList: store.top5List,
+                    newListCounter: store.newListCounter,
+                    isListNameEditActive: false,
+                    isItemEditActive: false,
+                    listMarkedForDeletion: payload.listMarkedForDeletion
                 })
             }
             
@@ -135,28 +147,22 @@ export const useGlobalStore = () => {
             const response = await api.createTop5List(newList);
             if (response.data.success) {
                 let top5List=response.data.top5List;
-                    async function getListPairs() {
-                        response = await api.getTop5ListPairs();
-                        if (response.data.success) {
-                            let pairsArray = response.data.idNamePairs;
-                            storeReducer({
-                                type: GlobalStoreActionType.CREATE_LIST,
-                                payload: {
-                                    idNamePairs: pairsArray,
-                                    top5List: top5List,
-                                    newListCounter: store.newListCounter++   
-                                }
-                            });
-                        }
+                store.setCurrentList(top5List._id);
+                storeReducer({
+                    type: GlobalStoreActionType.CREATE_LIST,
+                    payload: {
+                        top5List: top5List,
+                        newListCounter: store.newListCounter++   
                     }
-                getListPairs();
+                });
             }
         }
         asyncCreateList();
     }
 
     store.deleteMarkedList = function () {
-        
+        store.deleteList(store.listMarkedForDeletion);
+        store.hideDeleteListModal();
     }
 
     store.deleteList = function (id){
@@ -172,8 +178,15 @@ export const useGlobalStore = () => {
         asyncDeleteList(id);
     }
     //idNamePair has not been identified!
-    store.markListForDeletion = function (idNamePair) {
-
+    store.markListForDeletion = function (id) {
+        storeReducer({
+            type: GlobalStoreActionType.DELETE_LIST,
+            payload: {
+                listMarkedForDeletion: id
+            }
+        });
+        console.log(store.listMarkedForDeletion);
+        store.showDeleteListModal();
     }
 
     store.showDeleteListModal = function () {
