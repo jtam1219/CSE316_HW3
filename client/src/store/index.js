@@ -59,7 +59,7 @@ export const useGlobalStore = () => {
             case GlobalStoreActionType.DELETE_LIST: {
                 return setStore({
                     idNamePairs: store.idNamePairs,
-                    currentList: store.top5List,
+                    currentList: payload.top5List,
                     newListCounter: store.newListCounter,
                     isListNameEditActive: false,
                     isItemEditActive: false,
@@ -179,12 +179,20 @@ export const useGlobalStore = () => {
     }
     //idNamePair has not been identified!
     store.markListForDeletion = function (id) {
-        storeReducer({
-            type: GlobalStoreActionType.DELETE_LIST,
-            payload: {
-                listMarkedForDeletion: id
+        async function asyncSetCurrentList(id) {
+            let response = await api.getTop5ListById(id);
+            if (response.data.success) {
+                let top5List = response.data.top5List;
+                storeReducer({
+                    type: GlobalStoreActionType.DELETE_LIST,
+                    payload: {
+                        top5List: top5List,
+                        listMarkedForDeletion: id
+                    }
+                });
             }
-        });
+        }
+        asyncSetCurrentList(id);
         console.log(store.listMarkedForDeletion);
         store.showDeleteListModal();
     }
