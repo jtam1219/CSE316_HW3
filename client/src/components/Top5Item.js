@@ -27,7 +27,7 @@ function Top5Item(props) {
 
     function handleKeyPress(event) {
         if (event.code === "Enter") {
-            store.addChangeItemTransaction(index, text, index.name);
+            store.addChangeItemTransaction(index, text, store.currentList.items[index]);
             toggleEdit();
         }
     }
