@@ -169,6 +169,7 @@ export const useGlobalStore = () => {
         async function asyncDeleteList(id){
             let response = await api.deleteTop5ListById(id);
             if(response.data.success){
+                store.loadIdNamePairs();
                 storeReducer({
                     type: GlobalStoreActionType.CLOSE_CURRENT_LIST,
                     payload: {}
