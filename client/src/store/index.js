@@ -351,6 +351,7 @@ export const useGlobalStore = () => {
             }
         }
         updateList(top5List);
+        store.updateCurrentList();
     }
 
     store.updateCurrentList = function() {
@@ -380,6 +381,7 @@ export const useGlobalStore = () => {
     store.disableButton = function(id) {
         let button = document.getElementById(id);
         button.classList.add("top5-button-disabled");
+        button.disabled=true; 
     }
 
     store.enableButton = function(id) {
@@ -412,6 +414,7 @@ export const useGlobalStore = () => {
     }
 
     store.setIsItemNameEditActive = function () {
+        store.disableButton("close-button");
         storeReducer({
             type: GlobalStoreActionType.SET_ITEM_NAME_EDIT_ACTIVE,
             payload: null

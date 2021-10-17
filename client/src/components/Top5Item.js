@@ -28,6 +28,7 @@ function Top5Item(props) {
     function handleKeyPress(event) {
         if (event.code === "Enter") {
             store.addChangeItemTransaction(index, text, store.currentList.items[index]);
+            store.enableButton("close-button");
             toggleEdit();
         }
     }
