@@ -246,6 +246,7 @@ export const useGlobalStore = () => {
     // THIS FUNCTION PROCESSES CLOSING THE CURRENTLY LOADED LIST
     store.closeCurrentList = function () {
         store.clearAllTransactions();
+        store.updateToolbarButtons();
         storeReducer({
             type: GlobalStoreActionType.CLOSE_CURRENT_LIST,
             payload: {}
@@ -254,6 +255,8 @@ export const useGlobalStore = () => {
 
     // THIS FUNCTION LOADS ALL THE ID, NAME PAIRS SO WE CAN LIST ALL THE LISTS
     store.loadIdNamePairs = function () {
+        store.updateToolbarButtons();
+        store.disableButton("close-button");
         async function asyncLoadIdNamePairs() {
             const response = await api.getTop5ListPairs();
             if (response.data.success) {
@@ -275,6 +278,7 @@ export const useGlobalStore = () => {
     // FUNCTIONS ARE setCurrentList, addMoveItemTransaction, addUpdateItemTransaction,
     // moveItem, updateItem, updateCurrentList, undo, and redo
     store.setCurrentList = function (id) {
+        store.enableButton("close-button");
         async function asyncSetCurrentList(id) {
             let response = await api.getTop5ListById(id);
             if (response.data.success) {
@@ -353,6 +357,7 @@ export const useGlobalStore = () => {
         async function asyncUpdateCurrentList() {
             const response = await api.updateTop5ListById(store.currentList._id, store.currentList);
             if (response.data.success) {
+                store.updateToolbarButtons();
                 storeReducer({
                     type: GlobalStoreActionType.SET_CURRENT_LIST,
                     payload: store.currentList
@@ -368,8 +373,34 @@ export const useGlobalStore = () => {
         tps.doTransaction();
     }
 
-    store.clearAllTransactions = function(){
+    store.clearAllTransactions = function() {
         tps.clearAllTransactions();
+    }
+
+    store.disableButton = function(id) {
+        let button = document.getElementById(id);
+        button.classList.add("top5-button-disabled");
+    }
+
+    store.enableButton = function(id) {
+        let button = document.getElementById(id);
+        button.classList.remove("top5-button-disabled");
+    }
+
+    store.updateToolbarButtons = function() {
+        if (!tps.hasTransactionToUndo()) {
+            this.disableButton("undo-button");
+        }
+        else {
+            this.enableButton("undo-button");
+        }   
+        if (!tps.hasTransactionToRedo()) {
+            this.disableButton("redo-button");
+        }
+        else {
+            this.enableButton("redo-button");
+        }   
+        
     }
 
     // THIS FUNCTION ENABLES THE PROCESS OF EDITING A LIST NAME
