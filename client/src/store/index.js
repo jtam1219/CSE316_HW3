@@ -245,6 +245,7 @@ export const useGlobalStore = () => {
 
     // THIS FUNCTION PROCESSES CLOSING THE CURRENTLY LOADED LIST
     store.closeCurrentList = function () {
+        store.clearAllTransactions();
         storeReducer({
             type: GlobalStoreActionType.CLOSE_CURRENT_LIST,
             payload: {}
@@ -365,6 +366,10 @@ export const useGlobalStore = () => {
     }
     store.redo = function () {
         tps.doTransaction();
+    }
+
+    store.clearAllTransactions = function(){
+        tps.clearAllTransactions();
     }
 
     // THIS FUNCTION ENABLES THE PROCESS OF EDITING A LIST NAME
