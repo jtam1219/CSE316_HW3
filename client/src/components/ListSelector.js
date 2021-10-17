@@ -29,7 +29,7 @@ const ListSelector = () => {
 
     function handleClick(){
         let newList={
-            name: "Untitled",
+            name: "Untitled"+store.newListCounter,
             items: ["?","?","?","?","?"]
         }
         store.createList(newList)

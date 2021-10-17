@@ -172,7 +172,9 @@ export const useGlobalStore = () => {
                 store.loadIdNamePairs();
                 storeReducer({
                     type: GlobalStoreActionType.CLOSE_CURRENT_LIST,
-                    payload: {}
+                    payload: {
+                        newListCounter: store.newListCounter--
+                    }
                 });
             }
         }
