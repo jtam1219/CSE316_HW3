@@ -22,7 +22,7 @@ function ListCard(props) {
                 _id = ("" + _id).substring("list-card-text-".length);
 
             // CHANGE THE CURRENT LIST
-            store.setCurrentList(_id);
+            store.setCurrentList(_id);  
         }
     }
 
@@ -42,6 +42,9 @@ function ListCard(props) {
     function handleKeyPress(event) {
         if (event.code === "Enter") {
             let id = event.target.id.substring("list-".length);
+            /**if(text===""){
+                toggleEdit();
+            }**/
             store.changeListName(id, text);
             toggleEdit();
         }

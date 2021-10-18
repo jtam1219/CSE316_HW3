@@ -1,5 +1,6 @@
 import { React, useContext, useState } from "react";
 import { GlobalStoreContext } from '../store'
+import { useHistory } from 'react-router-dom'
 /*
     This React component represents a single item in our
     Top 5 List, which can be edited or moved around.
@@ -11,6 +12,7 @@ function Top5Item(props) {
     const [draggedTo, setDraggedTo] = useState(0);
     const [ editActive, setEditActive ] = useState(false);
     const [ text, setText ] = useState("");
+    store.history = useHistory();
 
     function handleToggleEdit(event) {
         event.stopPropagation();
@@ -23,11 +25,14 @@ function Top5Item(props) {
             store.setIsItemNameEditActive();
         }
         setEditActive(newActive);
+        console.log(editActive);
     }
 
     function handleKeyPress(event) {
         if (event.code === "Enter") {
             store.addChangeItemTransaction(index, text, store.currentList.items[index]);
+            store.enableButton("close-button");
+            store.enableButton("redo-button");
             store.enableButton("close-button");
             toggleEdit();
         }
@@ -68,6 +73,11 @@ function Top5Item(props) {
         store.addMoveItemTransaction(sourceId, targetId);
     }
 
+    let itemStatus = false;
+    if (store.isItemEditActive) {
+        itemStatus = true;
+    }
+
     let { index } = props;
     let itemClass = "top5-item";
     if (draggedTo) {
@@ -82,9 +92,10 @@ function Top5Item(props) {
             onDragEnter={handleDragEnter}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            draggable="true"
+            draggable={!itemStatus}
         >
             <input
+                disabled={itemStatus}
                 type="button"
                 id={"edit-item-" + index + 1}
                 className="list-card-button"
@@ -102,6 +113,7 @@ function Top5Item(props) {
                 type='text'
                 onKeyPress={handleKeyPress}
                 onChange={handleUpdateText}
+                draggable="false"
                 defaultValue={index.name}
             />;
     }

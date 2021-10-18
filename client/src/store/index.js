@@ -133,6 +133,17 @@ export const useGlobalStore = () => {
                     listMarkedForDeletion: null
                 });
             }
+
+            case GlobalStoreActionType.SET_ITEM_NAME_EDIT_ACTIVE: {
+                return setStore({
+                    idNamePairs: store.idNamePairs,
+                    currentList: store.currentList,
+                    newListCounter: store.newListCounter,
+                    isListNameEditActive: false,
+                    isItemEditActive: true,
+                    listMarkedForDeletion: null
+                });
+            }
             default:
                 return store;
         }
@@ -381,12 +392,13 @@ export const useGlobalStore = () => {
     store.disableButton = function(id) {
         let button = document.getElementById(id);
         button.classList.add("top5-button-disabled");
-        button.disabled=true; 
+        button.disabled=true;
     }
 
     store.enableButton = function(id) {
         let button = document.getElementById(id);
         button.classList.remove("top5-button-disabled");
+        button.disabled=false;
     }
 
     store.updateToolbarButtons = function() {
@@ -414,10 +426,12 @@ export const useGlobalStore = () => {
     }
 
     store.setIsItemNameEditActive = function () {
+        store.disableButton("undo-button");
+        store.disableButton("redo-button");
         store.disableButton("close-button");
         storeReducer({
             type: GlobalStoreActionType.SET_ITEM_NAME_EDIT_ACTIVE,
-            payload: null
+            payload: {}
         });
     }
 
