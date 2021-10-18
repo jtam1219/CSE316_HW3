@@ -17,6 +17,7 @@ export const GlobalStoreActionType = {
     CREATE_LIST: "CREATE_LIST",
     DELETE_LIST: "DELETE_LIST",
     CHANGE_LIST_NAME: "CHANGE_LIST_NAME",
+    CHANGE_ITEM_NAME: "CHANGE_ITEM_NAME",
     CLOSE_CURRENT_LIST: "CLOSE_CURRENT_LIST",
     LOAD_ID_NAME_PAIRS: "LOAD_ID_NAME_PAIRS",
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
@@ -310,6 +311,7 @@ export const useGlobalStore = () => {
     store.addMoveItemTransaction = function (start, end) {
         let transaction = new MoveItem_Transaction(store, start, end);
         tps.addTransaction(transaction);
+        store.updateToolbarButtons();
     }
     store.moveItem = function (start, end) {
         start -= 1;
@@ -337,6 +339,7 @@ export const useGlobalStore = () => {
     store.addChangeItemTransaction = function (index, newText, oldText) {
         let transaction = new ChangeItem_Transaction(store, index, newText, oldText);
         tps.addTransaction(transaction);
+        store.updateToolbarButtons();
     }
     store.changeItem = function (index, newName) {
         // GET THE LIST
@@ -350,7 +353,7 @@ export const useGlobalStore = () => {
                     if (response.data.success) {
                         let pairsArray = response.data.idNamePairs;
                         storeReducer({
-                            type: GlobalStoreActionType.CHANGE_LIST_NAME,
+                            type: GlobalStoreActionType.CHANGE_ITEM_NAME,
                             payload: {
                                 idNamePairs: pairsArray,
                                 top5List: top5List
@@ -362,7 +365,6 @@ export const useGlobalStore = () => {
             }
         }
         updateList(top5List);
-        store.updateCurrentList();
     }
 
     store.updateCurrentList = function() {
@@ -392,16 +394,16 @@ export const useGlobalStore = () => {
     store.disableButton = function(id) {
         let button = document.getElementById(id);
         button.classList.add("top5-button-disabled");
-        button.disabled=true;
     }
 
     store.enableButton = function(id) {
         let button = document.getElementById(id);
         button.classList.remove("top5-button-disabled");
-        button.disabled=false;
     }
 
     store.updateToolbarButtons = function() {
+        console.log("redo:"+tps.hasTransactionToRedo());
+        console.log("undo:"+tps.hasTransactionToUndo());
         if (!tps.hasTransactionToUndo()) {
             this.disableButton("undo-button");
         }
